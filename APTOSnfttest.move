@@ -1,4 +1,4 @@
-module nfttest4::nfttest4 {
+module nfttest::nfttest {
     use std::bcs;
     use std::signer;
     use std::string::{Self, String};
@@ -13,7 +13,7 @@ module nfttest4::nfttest4 {
     const ENOT_AUTHORIZED: u64 = 1;
 
     fun init_module(source_account: &signer) {
-        let collection_name = string::utf8(b"testing2");
+        let collection_name = string::utf8(b"testing9");
         let description = string::utf8(b"Description");
         let collection_uri = string::utf8(b"https://www.csusm.edu/");
         let token_name = string::utf8(b"Token name");
@@ -53,7 +53,7 @@ module nfttest4::nfttest4 {
     }
 
     public entry fun mint_one_to_sender(receiver: &signer) acquires ModuleData {
-        let module_data = borrow_global_mut<ModuleData>(@nfttest4);
+        let module_data = borrow_global_mut<ModuleData>(@nfttest);
 
         let token_id = token::mint_token(receiver, module_data.token_data_id, 1);
         token::direct_transfer(receiver, receiver, token_id, 1);
@@ -79,9 +79,9 @@ module nfttest4::nfttest4 {
         );
     }
 
-    public entry fun mint_100_to_sender(account: &signer) acquires ModuleData {
+    public entry fun mint_amount_to_sender(account: &signer, num: u64) acquires ModuleData {
         let k:u64 = 0;
-        while (k < 100) {
+        while (k < num) {
             mint_one_to_sender(account);
             k = k + 1;
         }
