@@ -4,7 +4,6 @@ module nfttest::nfttest {
     use sui::tx_context::sender;
     use sui::package;
     use sui::display;
-    use sui::event;
 
     public struct MyNFT has key, store {
         id: UID,
@@ -15,12 +14,6 @@ module nfttest::nfttest {
     }
 
     public struct NFTTEST has drop {}
-
-    public struct NFTMinted has copy, drop {
-        object_id: ID,
-        creator: address,
-        name: String,
-    }
 
     fun init(otw: NFTTEST, ctx: &mut TxContext) {
         let keys = vector[
@@ -49,41 +42,26 @@ module nfttest::nfttest {
         transfer::public_transfer(display, sender(ctx));
     }
 
-    public entry fun mint_one_to_sender(
+    public entry fun mint_amount_to_sender(
         name: vector<u8>,
         description: vector<u8>,
         url: vector<u8>,
+        num: u64,
         ctx: &mut TxContext
     ) {
         let sender = tx_context::sender(ctx);
-        let nft = MyNFT {
-            id: object::new(ctx),
-            name: utf8(name),
-            description: utf8(description),
-            creator: sender(ctx),
-            url: url::new_unsafe_from_bytes(url),
-        };
-
-        event::emit(NFTMinted {
-            object_id: object::id(&nft),
-            creator: sender,
-            name: nft.name,
-        });
-
-        transfer::public_transfer(nft, sender);
-    }
-
-    public entry fun mint_100_to_sender(
-        name: vector<u8>,
-        description: vector<u8>,
-        url: vector<u8>,
-        ctx: &mut TxContext
-    ) {
         let mut k:u64 = 0;
-        while (k < 100) {
-            mint_one_to_sender(name, description, url, ctx);
+        while(k < num) {
+            let nft = MyNFT {
+                id: object::new(ctx),
+                name: utf8(name),
+                description: utf8(description),
+                creator: sender(ctx),
+                url: url::new_unsafe_from_bytes(url),
+            };
+
+            transfer::public_transfer(nft, sender);
             k = k + 1;
         }
     }
-
 }
